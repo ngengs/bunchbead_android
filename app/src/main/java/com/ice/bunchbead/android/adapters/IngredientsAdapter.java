@@ -110,7 +110,7 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
 
     public void search(String textSearch) {
         searchData = new ArrayList<>();
-        for (Ingredient ingredient: data) {
+        for (Ingredient ingredient : data) {
             if (ingredient.getNama().contains(textSearch)) {
                 searchData.add(ingredient);
             }
