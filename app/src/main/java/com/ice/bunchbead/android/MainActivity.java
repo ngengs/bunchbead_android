@@ -3,7 +3,6 @@ package com.ice.bunchbead.android;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,16 +16,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.ice.bunchbead.android.adapters.IngredientsAdapter;
 import com.ice.bunchbead.android.data.Ingredient;
+import com.ice.bunchbead.android.listener.firebase.DataChildListener;
+import com.ice.bunchbead.android.listener.search.SearchListener;
 
 import timber.log.Timber;
 
@@ -108,55 +108,49 @@ public class MainActivity extends AppCompatActivity {
         mIndicator.setVisibility(View.VISIBLE);
         mRecycler.setVisibility(View.INVISIBLE);
         // Create data listener
-        mDataListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                // Add single data to the list (adapter)
-                Ingredient data = dataSnapshot.getValue(Ingredient.class);
-                if (data != null) {
-                    data.setId(dataSnapshot.getKey());
-                    mAdapter.add(data);
+        mDataListener = new DataChildListener(
+                (dataSnapshot, previousChildName) -> {
+                    // Add single data to the list (adapter)
+                    Ingredient data = dataSnapshot.getValue(Ingredient.class);
+                    if (data != null) {
+                        data.setId(dataSnapshot.getKey());
+                        mAdapter.add(data);
+                    }
+                    // Invalidate menu to showing the search indicator
+                    invalidateOptionsMenu();
+                    // Show list and hide loading indicator after add data
+                    mIndicator.setVisibility(View.GONE);
+                    mRecycler.setVisibility(View.VISIBLE);
+                    Timber.d("On Child Added, %s", data);
+                },
+                (dataSnapshot, previousChildName) -> {
+                    // Change single data to the list
+                    Ingredient data = dataSnapshot.getValue(Ingredient.class);
+                    if (data != null) {
+                        data.setId(dataSnapshot.getKey());
+                        mAdapter.change(data);
+                    }
+                    Timber.d("On Child Changed, %s", data);
+                },
+                dataSnapshot -> {
+                    // Remove single data from the list
+                    Ingredient data = dataSnapshot.getValue(Ingredient.class);
+                    if (data != null) {
+                        data.setId(dataSnapshot.getKey());
+                        mAdapter.remove(data);
+                    }
+                    Timber.d("On Child Removed, %s", data);
+                },
+                (dataSnapshot, previousChildName) -> Timber.d("On Child Moved"),
+                databaseError -> {
+                    Timber.e(databaseError.toException(), "On Child Canceled: %s",
+                            databaseError.getMessage());
+                    Toast.makeText(
+                            this,
+                            "Terdapat kesalahan dalam mengambil data", Toast.LENGTH_SHORT
+                    ).show();
                 }
-                // Invalidate menu to showing the search indicator
-                invalidateOptionsMenu();
-                // Show list and hide loading indicator after add data
-                mIndicator.setVisibility(View.GONE);
-                mRecycler.setVisibility(View.VISIBLE);
-                Timber.d("On Child Added, %s", data);
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                // Change single data to the list
-                Ingredient data = dataSnapshot.getValue(Ingredient.class);
-                if (data != null) {
-                    data.setId(dataSnapshot.getKey());
-                    mAdapter.change(data);
-                }
-                Timber.d("On Child Changed, %s", data);
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                // Remove single data from the list
-                Ingredient data = dataSnapshot.getValue(Ingredient.class);
-                if (data != null) {
-                    data.setId(dataSnapshot.getKey());
-                    mAdapter.remove(data);
-                }
-                Timber.d("On Child Removed, %s", data);
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                Timber.d("On Child Moved");
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Timber.d("On Child Canceled");
-            }
-        };
+        );
         // Start listening data
         mDatabase.orderByChild("nama").addChildEventListener(mDataListener);
     }
@@ -184,22 +178,15 @@ public class MainActivity extends AppCompatActivity {
                 mSearchView.onActionViewCollapsed();
                 return true;
             });
-            mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    // No need listen submit action because already listen typing
-                    return false;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    // Perform search when typing & remove search when type value is empty
-                    Timber.d("Text changed to: %s", newText);
-                    if (newText.equals("")) mAdapter.clearSearch();
-                    else mAdapter.search(newText);
-                    return true;
-                }
-            });
+            mSearchView.setOnQueryTextListener(new SearchListener(
+                    null, // No need listen submit action because already listen typing
+                    text -> {
+                        // Perform search when typing & remove search when type value is empty
+                        Timber.d("Text changed to: %s", text);
+                        if (text.equals("")) mAdapter.clearSearch();
+                        else mAdapter.search(text);
+                        return true;
+                    }));
         }
     }
 
