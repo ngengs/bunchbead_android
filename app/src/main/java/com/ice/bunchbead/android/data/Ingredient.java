@@ -2,8 +2,8 @@ package com.ice.bunchbead.android.data;
 
 public class Ingredient {
     private String id;
-    private String min;
-    private String sisa;
+    private Double min;
+    private Double sisa;
     private String satuan;
     private String nama;
 
@@ -11,7 +11,7 @@ public class Ingredient {
         // Emoty Constructor
     }
 
-    public Ingredient(String min, String sisa, String satuan, String nama) {
+    public Ingredient(Double min, Double sisa, String satuan, String nama) {
         this.min = min;
         this.sisa = sisa;
         this.satuan = satuan;
@@ -26,19 +26,19 @@ public class Ingredient {
         this.id = id;
     }
 
-    public String getMin() {
+    public Double getMin() {
         return min;
     }
 
-    public void setMin(String min) {
+    public void setMin(Double min) {
         this.min = min;
     }
 
-    public String getSisa() {
+    public Double getSisa() {
         return sisa;
     }
 
-    public void setSisa(String sisa) {
+    public void setSisa(Double sisa) {
         this.sisa = sisa;
     }
 

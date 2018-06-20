@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.ice.bunchbead.android.R;
 import com.ice.bunchbead.android.data.Ingredient;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +44,7 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
         } else {
             ingredient = searchData.get(position);
         }
-        if (Double.parseDouble(ingredient.getSisa()) <= Double.parseDouble(ingredient.getMin())) {
+        if (ingredient.getSisa() <= ingredient.getMin()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 holder.root.setCardBackgroundColor(mContext.getColor(R.color.ingredient_need_attention));
             } else {
@@ -56,8 +58,15 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
             }
         }
         holder.productName.setText(ingredient.getNama());
-        holder.minStock.setText(mContext.getString(R.string.ingredients_min_count, ingredient.getMin(), ingredient.getSatuan()));
-        holder.nowStock.setText(mContext.getString(R.string.ingredients_now_count, ingredient.getSisa(), ingredient.getSatuan()));
+        NumberFormat numberFormat = new DecimalFormat("##.###");
+        holder.minStock.setText(
+                mContext.getString(R.string.ingredients_min_count,
+                        numberFormat.format(ingredient.getMin()), ingredient.getSatuan())
+        );
+        holder.nowStock.setText(
+                mContext.getString(R.string.ingredients_now_count,
+                        numberFormat.format(ingredient.getSisa()), ingredient.getSatuan())
+        );
     }
 
     public void add(Ingredient ingredient) {
