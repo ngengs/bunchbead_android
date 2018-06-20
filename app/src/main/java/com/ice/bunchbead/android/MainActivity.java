@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -142,14 +141,7 @@ public class MainActivity extends AppCompatActivity {
                     Timber.d("On Child Removed, %s", data);
                 },
                 (dataSnapshot, previousChildName) -> Timber.d("On Child Moved"),
-                databaseError -> {
-                    Timber.e(databaseError.toException(), "On Child Canceled: %s",
-                            databaseError.getMessage());
-                    Toast.makeText(
-                            this,
-                            "Terdapat kesalahan dalam mengambil data", Toast.LENGTH_SHORT
-                    ).show();
-                }
+                databaseError -> Timber.d("On Child Canceled")
         );
         // Start listening data
         mDatabase.orderByChild("nama").addChildEventListener(mDataListener);
