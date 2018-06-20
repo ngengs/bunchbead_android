@@ -1,6 +1,5 @@
 package com.ice.bunchbead.android;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -52,7 +51,6 @@ public class LoginActivity extends AppCompatActivity {
             passwordEditText.setEnabled(false);
             loginButton.setVisibility(View.GONE);
             loginProgress.setVisibility(View.VISIBLE);
-            Context context = this;
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -63,7 +61,11 @@ public class LoginActivity extends AppCompatActivity {
                             passwordEditText.setEnabled(true);
                             loginButton.setVisibility(View.VISIBLE);
                             loginProgress.setVisibility(View.GONE);
-                            Toast.makeText(context, "Login gagal, periksa email dan password anda", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(
+                                    this,
+                                    "Login gagal, periksa email dan password anda",
+                                    Toast.LENGTH_SHORT
+                            ).show();
                         }
                     });
         }
