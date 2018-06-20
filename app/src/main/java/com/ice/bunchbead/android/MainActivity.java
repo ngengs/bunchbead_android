@@ -4,10 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecycler;
     private SearchView mSearchView;
     private View mIndicator;
+    private DrawerLayout mDrawer;
 
     // Listener variable
     private IngredientsAdapter mAdapter;
@@ -53,6 +59,18 @@ public class MainActivity extends AppCompatActivity {
         // Init View variable
         mIndicator = findViewById(R.id.itemsIndicatorGroup);
         mRecycler = findViewById(R.id.itemsRecycler);
+        mDrawer = findViewById(R.id.drawer_layout);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        NavigationView mNavigationView = findViewById(R.id.nav_view);
+
+        // Configure toolbar and drawer
+        setSupportActionBar(toolbar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawer, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(toggle);
+        toggle.syncState();
+        mNavigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
 
         // Configure recyclerview
         mAdapter = new IngredientsAdapter(this);
@@ -120,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                // Remove single data fromt he list
+                // Remove single data from the list
                 Ingredient data = dataSnapshot.getValue(Ingredient.class);
                 if (data != null) {
                     data.setId(dataSnapshot.getKey());
@@ -157,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         if (mSearchView != null) {
             Timber.d("listenSearch started");
             // Build search view properties
-            mSearchView.setQueryHint("Enter Name");
+            mSearchView.setQueryHint(getString(R.string.search_placeholder));
             // Listen Search View
             mSearchView.setOnCloseListener(() -> {
                 // Clear search when close button clicker
@@ -216,5 +234,39 @@ public class MainActivity extends AppCompatActivity {
             // Default back action
             super.onBackPressed();
         }
+    }
+
+    private boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        Timber.d("onNavigationItemSelected() called with: item = [" + id + "]");
+        boolean changed;
+        switch (id) {
+            case R.id.nav_home:
+                changed = true;
+                break;
+            case R.id.nav_notification:
+                changed = true;
+                runNotification();
+                break;
+            case R.id.nav_logout:
+                changed = true;
+                runLogout();
+                break;
+            default:
+                changed = false;
+        }
+
+        mDrawer.closeDrawer(GravityCompat.START);
+        return changed;
+    }
+
+    private void runLogout() {
+        FirebaseAuth.getInstance().signOut();
+        runLogin();
+        finish();
+    }
+
+    private void runNotification() {
+        // TODO: Handle this function to open notification page
     }
 }
