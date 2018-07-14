@@ -1,8 +1,13 @@
 <resources>
     <string name="app_name">Bunchbead</string>
 
+    <string name="ingredients_min">Min:</string>
     <string name="ingredients_min_count">Min: %1$s %2$s</string>
+    <string name="ingredients_now">Sisa:</string>
     <string name="ingredients_now_count">Sisa: %1$s %2$s</string>
+    <string name="ingredients_price">Harga:</string>
+    <string name="ingredients_count_unit">%1$s %2$s</string>
+
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -11,6 +16,7 @@
     <string name="home">Beranda</string>
     <string name="home_detail">Beranda - Daftar Bahan</string>
     <string name="notification">Notifikasi</string>
+    <string name="loading">Memuat…</string>
     <string name="other">Lainnya</string>
     <string name="logout">Keluar</string>
 
@@ -21,4 +27,11 @@
     <!--Image Description-->
     <string name="logo">Logo</string>
     <string name="icon_loading_data">Icon Loading Data</string>
+
+    <!--Update Ingredient-->
+    <string name="update">Simpan</string>
+    <string name="price_format">Rp. %1$s</string>
+    <string name="add_ingredient_count">Tambah Jumlah</string>
+    <string name="price_total">Total Biaya:</string>
+
 </resources>

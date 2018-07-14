@@ -1,7 +1,6 @@
 package com.ice.bunchbead.android.adapters;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +11,7 @@ import android.widget.TextView;
 
 import com.ice.bunchbead.android.R;
 import com.ice.bunchbead.android.data.Ingredient;
+import com.ice.bunchbead.android.helpers.UtilHelper;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -45,17 +45,9 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
             ingredient = searchData.get(position);
         }
         if (ingredient.getSisa() <= ingredient.getMin()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                holder.root.setCardBackgroundColor(mContext.getColor(R.color.ingredient_need_attention));
-            } else {
-                holder.root.setCardBackgroundColor(mContext.getResources().getColor(R.color.ingredient_need_attention));
-            }
+            holder.root.setCardBackgroundColor(UtilHelper.getColor(mContext, R.color.ingredient_need_attention));
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                holder.root.setCardBackgroundColor(mContext.getColor(R.color.ingredient_normal));
-            } else {
-                holder.root.setCardBackgroundColor(mContext.getResources().getColor(R.color.ingredient_normal));
-            }
+            holder.root.setCardBackgroundColor(UtilHelper.getColor(mContext, R.color.ingredient_normal));
         }
         holder.productName.setText(ingredient.getNama());
         NumberFormat numberFormat = new DecimalFormat("##.###");
@@ -75,13 +67,7 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
     }
 
     public void change(Ingredient ingredient) {
-        int position = -1;
-        for (int i = 0; i < getItemCount(); i++) {
-            if (ingredient.getId().equals(data.get(i).getId())) {
-                position = i;
-                break;
-            }
-        }
+        int position = findPosition(ingredient);
         if (position > -1) {
             data.set(position, ingredient);
             if (searchData == null) notifyItemChanged(position);
@@ -89,6 +75,14 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
     }
 
     public void remove(Ingredient ingredient) {
+        int position = findPosition(ingredient);
+        if (position > -1) {
+            data.remove(position);
+            if (searchData == null) notifyItemRemoved(position);
+        }
+    }
+
+    private int findPosition(Ingredient ingredient) {
         int position = -1;
         for (int i = 0; i < getItemCount(); i++) {
             if (ingredient.getId().equals(data.get(i).getId())) {
@@ -96,10 +90,7 @@ public class IngredientsAdapter extends RecyclerView.Adapter<IngredientsAdapter.
                 break;
             }
         }
-        if (position > -1) {
-            data.remove(position);
-            if (searchData == null) notifyItemRemoved(position);
-        }
+        return position;
     }
 
     public void clear() {

@@ -6,4 +6,5 @@
 
     <color name="ingredient_normal">#FFF</color>
     <color name="ingredient_need_attention">@color/colorAccent</color>
+    <color name="ingredient_no_need_attention">#E0E0E0</color>
 </resources>

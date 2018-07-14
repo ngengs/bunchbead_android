@@ -6,16 +6,18 @@ public class Ingredient {
     private Double sisa;
     private String satuan;
     private String nama;
+    private Long harga;
 
     public Ingredient() {
         // Emoty Constructor
     }
 
-    public Ingredient(Double min, Double sisa, String satuan, String nama) {
+    public Ingredient(Double min, Double sisa, String satuan, String nama, Long harga) {
         this.min = min;
         this.sisa = sisa;
         this.satuan = satuan;
         this.nama = nama;
+        this.harga = harga;
     }
 
     public String getId() {
@@ -58,6 +60,14 @@ public class Ingredient {
         this.nama = nama;
     }
 
+    public Long getHarga() {
+        return harga;
+    }
+
+    public void setHarga(Long harga) {
+        this.harga = harga;
+    }
+
     @Override
     public String toString() {
         return "Ingredient{" +
@@ -66,6 +76,7 @@ public class Ingredient {
                 ", sisa='" + sisa + '\'' +
                 ", satuan='" + satuan + '\'' +
                 ", nama='" + nama + '\'' +
+                ", harga='" + harga + '\'' +
                 '}';
     }
 }

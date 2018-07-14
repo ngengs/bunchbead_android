@@ -18,12 +18,12 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.ice.bunchbead.android.adapters.IngredientsAdapter;
 import com.ice.bunchbead.android.data.Ingredient;
+import com.ice.bunchbead.android.helpers.UserHelper;
 import com.ice.bunchbead.android.listener.firebase.DataChildListener;
 import com.ice.bunchbead.android.listener.search.SearchListener;
 
@@ -31,8 +31,6 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Firebase variable
-    private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
     // View variable
@@ -40,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private SearchView mSearchView;
     private View mIndicator;
     private DrawerLayout mDrawer;
+    private NavigationView mNavigationView;
 
     // Listener variable
     private IngredientsAdapter mAdapter;
@@ -48,9 +47,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         // Check user before start main
-        checkUser();
+        UserHelper.checkLogin(mAuth, () -> UserHelper.runLogin(this));
 
         // Init layout
         setContentView(R.layout.activity_main);
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         mRecycler = findViewById(R.id.itemsRecycler);
         mDrawer = findViewById(R.id.drawer_layout);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        NavigationView mNavigationView = findViewById(R.id.nav_view);
+        mNavigationView = findViewById(R.id.nav_view);
 
         // Configure toolbar and drawer
         setSupportActionBar(toolbar);
@@ -71,12 +70,12 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
         mNavigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
 
-        // Configure recyclerview
+        // Configure recyclerView
         mAdapter = new IngredientsAdapter(this);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mRecycler.setAdapter(mAdapter);
 
-        // Init firebase database
+        // Init FireVase database
         mDatabase = FirebaseDatabase.getInstance().getReference("bahan");
 
     }
@@ -147,14 +146,6 @@ public class MainActivity extends AppCompatActivity {
         mDatabase.orderByChild("nama").addChildEventListener(mDataListener);
     }
 
-    private void checkUser() {
-        // If dont have user account run login page
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            runLogin();
-        }
-    }
-
     private void listenSearch() {
         Timber.d("listenSearch called");
         // Listen searched text  when search is ready
@@ -197,12 +188,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void runLogin() {
-        // Open login page and close this activity
-        startActivity(new Intent(this, LoginActivity.class));
-        finish();
-    }
-
     @Override
     public void onBackPressed() {
         // Close search when pressing back but search view is open
@@ -229,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.nav_logout:
                 changed = true;
-                runLogout();
+                UserHelper.runLogout(this);
                 break;
             default:
                 changed = false;
@@ -239,13 +224,13 @@ public class MainActivity extends AppCompatActivity {
         return changed;
     }
 
-    private void runLogout() {
-        FirebaseAuth.getInstance().signOut();
-        runLogin();
-        finish();
+    private void runNotification() {
+        startActivityForResult(new Intent(this, NotificationResultActivity.class), 100);
     }
 
-    private void runNotification() {
-        // TODO: Handle this function to open notification page
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mNavigationView.setCheckedItem(R.id.nav_home);
     }
 }
