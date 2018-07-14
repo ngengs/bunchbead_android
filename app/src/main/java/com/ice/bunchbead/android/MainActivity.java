@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
         mNavigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+        setTitle(R.string.home_detail);
 
         // Configure recyclerView
         mAdapter = new IngredientsAdapter(this);

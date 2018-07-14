@@ -17,6 +17,8 @@ public class UserHelper {
         // If don't have user account run UserNotExistListener
         if (currentUser == null) {
             onNotExist.onUserNotExist();
+        } else {
+            NotificationHelper.registerNotification();
         }
     }
 
@@ -27,6 +29,7 @@ public class UserHelper {
 
     public static void runLogout(Activity activity) {
         FirebaseAuth.getInstance().signOut();
+        NotificationHelper.unregisterNotification();
         runLogin(activity);
     }
 
