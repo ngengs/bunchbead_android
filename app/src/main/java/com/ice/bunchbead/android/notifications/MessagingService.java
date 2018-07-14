@@ -54,7 +54,7 @@ public class MessagingService extends FirebaseMessagingService {
                 .setColor(UtilHelper.getColor(this, R.color.colorPrimary))
                 .setAutoCancel(true)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(100, notificationBuilder.build());
     }
